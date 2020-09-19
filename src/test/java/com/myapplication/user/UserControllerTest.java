@@ -1,12 +1,11 @@
 package com.myapplication.user;
 
 import com.myapplication.WebTest;
-import com.myapplication.email.Email;
-import com.myapplication.email.EmailRepo;
+import com.myapplication.email.EmailService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -17,10 +16,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static java.util.stream.StreamSupport.stream;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -28,8 +25,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest()
 public class UserControllerTest extends WebTest {
 
-    @Autowired
-    private EmailRepo emailRepo;
+    @MockBean
+    private EmailService emailService;
 
     @Test
     public void testWithoutTransaction() {
@@ -39,7 +36,8 @@ public class UserControllerTest extends WebTest {
 
         getUserNTimesAsync(url, 10);
 
-        assertThat(getEmailCount(id), greaterThan(1));
+        verify(emailService, atLeast(2))
+                .sendWelcomeEmail(eq(id));
     }
 
     @Test
@@ -50,14 +48,8 @@ public class UserControllerTest extends WebTest {
 
         getUserNTimesAsync(url, 10);
 
-        assertEquals(getEmailCount(id), 1);
-    }
-
-    private int getEmailCount(String id) {
-        List<Email> emails = stream(emailRepo.findAll().spliterator(),false)
-                .filter(email -> id.equals(email.getTo()))
-                .collect(Collectors.toList());
-        return emails.size();
+        verify(emailService, times(1))
+                .sendWelcomeEmail(eq(id));
     }
 
     private List<User> getUserNTimesAsync(String path, int count) {

@@ -7,13 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
-    private final EmailRepo emailRepo;
-
-    public EmailService(EmailRepo emailRepo) {
-        this.emailRepo = emailRepo;
-    }
-
-    public Email sendWelcomeEmail(String to) {
-        return emailRepo.save(new Email(to));
+    public void sendWelcomeEmail(String to) {
+        log.info("Sending welcome email to {}", to);
     }
 }
