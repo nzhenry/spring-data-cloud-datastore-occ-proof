@@ -7,7 +7,13 @@ import org.springframework.data.annotation.Id;
 @Data
 @Entity
 public class MyEntity {
+
     @Id
-    private String id;
-    private int updateCount;
+    private final String id;
+
+    private int saveCount;
+
+    public MyEntity(String id){
+        this.id = id;
+    }
 }

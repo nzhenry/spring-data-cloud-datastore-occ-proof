@@ -29,12 +29,12 @@ public class MyControllerTest extends WebTest {
         String id = UUID.randomUUID().toString();
         String url = "/my-entity/" + id;
 
-        int maxUpdateCount = putEntities(url, 10)
-                .mapToInt(MyEntity::getUpdateCount)
+        int maxCount = putEntities(url, 10)
+                .mapToInt(MyEntity::getSaveCount)
                 .max()
                 .getAsInt();
 
-        assertThat(maxUpdateCount, lessThan(9));
+        assertThat(maxCount, lessThan(10));
     }
 
     @Test
@@ -43,12 +43,12 @@ public class MyControllerTest extends WebTest {
         String id = UUID.randomUUID().toString();
         String url = "/my-entity/" + id + "?transactional=true";
 
-        int maxUpdateCount = putEntities(url, 10)
-                .mapToInt(MyEntity::getUpdateCount)
+        int maxCount = putEntities(url, 10)
+                .mapToInt(MyEntity::getSaveCount)
                 .max()
                 .getAsInt();
 
-        assertEquals(9, maxUpdateCount);
+        assertEquals(10, maxCount);
     }
 
     private Stream<MyEntity> putEntities(String path, int count) {

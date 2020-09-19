@@ -28,11 +28,9 @@ public class MyService {
     private MyEntity putEntity(String id, DatastoreRepository<MyEntity, String> ops) {
         MyEntity instance = ops.findById(id).orElse(null);
         if(instance == null) {
-            instance = new MyEntity();
-            instance.setId(id);
-        } else {
-            instance.setUpdateCount(instance.getUpdateCount() + 1);
+            instance = new MyEntity(id);
         }
+        instance.setSaveCount(instance.getSaveCount() + 1);
         return ops.save(instance);
     }
 }
